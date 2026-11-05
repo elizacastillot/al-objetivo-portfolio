@@ -1,0 +1,23 @@
+# ─────────────────────────────────────────────────────────────
+# Lista blanca: a GitHub solo sube lo imprescindible para publicar.
+# Todo lo demás (agentes, skills, marca, buyer persona, documentos,
+# originales, mockup) se queda SOLO en el ordenador de Elizabeth.
+# ─────────────────────────────────────────────────────────────
+
+# 1. Ignorar todo lo que haya en la raíz...
+/*
+
+# 2. ...excepto esto:
+!/.gitignore
+!/site/
+!/.github/
+!/scripts/
+
+# 3. Dentro de lo permitido, nunca subir:
+.DS_Store
+Thumbs.db
+*.log
+node_modules/
+.env
+.env.*
+/scripts/smoke.mjs

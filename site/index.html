@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Portafolio · Elizabeth Castillo · Al Objetivo</title>
+  <meta name="description" content="Casos reales de estrategia, contenido, email marketing y automatización para pymes y negocios que necesitan resultados medibles. Portafolio de Al Objetivo.">
+  <meta name="robots" content="noindex, nofollow">
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="Portafolio · Elizabeth Castillo · Al Objetivo">
+  <meta property="og:description" content="Casos reales de estrategia, contenido, email marketing y automatización para pymes y negocios que necesitan resultados medibles. Portafolio de Al Objetivo.">
+  <link rel="preload" as="image" href="assets/marca/arquera-navy.png" imagesrcset="assets/marca/arquera-navy.png 600w, assets/marca/arquera-navy@2x.png 1200w" imagesizes="(min-width: 1024px) 516px, 78vw">
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+  <a class="saltar" id="saltar" href="#principal"></a>
+
+  <header class="nav" id="nav">
+    <div class="nav-barra">
+      <a class="nav-logo" id="nav-logo" href="#hero"></a>
+      <nav class="nav-enlaces" id="nav-enlaces" aria-label="Secciones"></nav>
+      <button type="button" class="nav-menu-btn" id="nav-menu-btn" aria-expanded="false" aria-controls="nav-panel"></button>
+    </div>
+    <div class="vuelo" id="vuelo" aria-hidden="true"><span class="vuelo-linea" id="vuelo-linea"></span><span class="vuelo-punto" id="vuelo-punto"></span></div>
+    <nav class="nav-panel" id="nav-panel" aria-label="Secciones" hidden></nav>
+  </header>
+
+  <main id="principal">
+    <div class="pagina" id="pagina">
+      <svg class="trayectoria" id="trayectoria" aria-hidden="true" focusable="false"></svg>
+
+      <section id="hero" class="sec sec-hero" aria-labelledby="hero-titulo"></section>
+      <section id="sectores" class="sec sec-sectores" aria-labelledby="sectores-titulo"></section>
+      <section id="arco" class="sec sec-arco" aria-labelledby="arco-titulo"></section>
+      <section id="tiradas" class="sec sec-tiradas" aria-labelledby="tiradas-titulo"></section>
+      <section id="carcaj" class="sec sec-carcaj" aria-labelledby="carcaj-titulo"></section>
+      <section id="contacto" class="sec sec-contacto" aria-labelledby="contacto-titulo"></section>
+    </div>
+  </main>
+
+  <footer class="pie" id="pie"></footer>
+
+  <div class="modal" id="modal" hidden>
+    <div class="modal-card" id="modal-card" role="dialog" aria-modal="true" aria-labelledby="modal-titulo" tabindex="-1"></div>
+  </div>
+
+  <div class="recorrido-barra" id="recorrido-barra" role="status" aria-live="polite" hidden>
+    <span class="recorrido-texto" id="recorrido-texto"></span>
+    <button type="button" class="recorrido-parar" id="recorrido-parar"></button>
+  </div>
+
+  <p class="solo-lectores" id="aviso" aria-live="polite"></p>
+
+  <script src="data/textos.js"></script>
+  <script src="data/marcas.js"></script>
+  <script src="data/trayectoria.js"></script>
+  <script src="data/casos.js"></script>
+  <script src="data/carcaj.js"></script>
+  <script src="js/main.js"></script>
+</body>
+</html>
