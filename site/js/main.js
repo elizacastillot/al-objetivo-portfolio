@@ -981,7 +981,7 @@
     objetivos.forEach(function (n) { io.observe(n); });
   }
 
-  /* ---------- trayectoria (desde 1200 px) ---------- */
+  /* ---------- trayectoria (≥ 1200 px: curva con dianas en los márgenes; < 1200 px: recta en el margen izquierdo) ---------- */
   var tr = $('trayectoria');
   var pagina = $('pagina');
   var geo = null;
@@ -994,7 +994,6 @@
   function construirTrayectoria() {
     vaciar(tr);
     geo = null;
-    if (anchoDoc() < 1200) return;
     pagina.classList.add('midiendo');
     try { trazar(); } finally { pagina.classList.remove('midiendo'); }
   }
@@ -1004,15 +1003,23 @@
     tr.setAttribute('viewBox', '0 0 ' + W + ' ' + H);
     function cy(r) { return r.top - pr.top + r.height / 2; }
 
-    var imagen = $('hero').querySelector('.hero-arte img');
-    if (!imagen) return;
-    var ir = imagen.getBoundingClientRect();
-    var punta = ((T.hero || {}).ilustracion || {}).punta || [0.048, 0.433];
-    var sx = ir.left - pr.left + ir.width * punta[0];
-    var sy = ir.top - pr.top + ir.height * punta[1];
-    var gx = ir.left - pr.left - 12; // centro del medianil entre el texto y la arquera
+    var movil = anchoDoc() < 1200;
+    var sx = 0, sy = 0, gx = 0;
+    if (!movil) {
+      var imagen = $('hero').querySelector('.hero-arte img');
+      if (!imagen) return;
+      var ir = imagen.getBoundingClientRect();
+      var punta = ((T.hero || {}).ilustracion || {}).punta || [0.048, 0.433];
+      sx = ir.left - pr.left + ir.width * punta[0];
+      sy = ir.top - pr.top + ir.height * punta[1];
+      gx = ir.left - pr.left - 12; // centro del medianil entre el texto y la arquera
+    }
 
-    var mx = Math.max(28, (W - 1080) / 4);
+    // Móvil y tablet: una recta por el centro del margen izquierdo; las dianas caben en ese margen
+    var margenPx = parseFloat(getComputedStyle(document.querySelector('.wrap')).paddingLeft) || 20;
+    var lx = margenPx / 2;
+    var rDiana = Math.max(7, Math.min(12, lx - 2));
+    var mx = movil ? lx : Math.max(28, (W - 1080) / 4);
     var destinos = [];
     var k = 0;
     SECCIONES.slice(1).forEach(function (id) {
@@ -1028,28 +1035,44 @@
       if (id === 'sectores') y = r.top - pr.top + (parseFloat(getComputedStyle(ancla).lineHeight) || r.height) / 2;
       // El cierre: la línea acaba en el borde superior del anillo exterior de la diana final
       if (final) y = r.top - pr.top + r.height * 0.02;
-      destinos.push({ id: id, final: final, x: final ? W / 2 : (i % 2 === 0 ? mx : W - mx), y: y, g: top });
+      destinos.push({ id: id, final: final, x: final ? W / 2 : (movil || i % 2 === 0 ? mx : W - mx), y: y, g: top });
       // La flecha se detiene también en cada caso de éxito
       if (id === 'tiradas') {
         Array.prototype.forEach.call(sec.querySelectorAll('.caso'), function (art) {
           var marca = art.querySelector('.caso-meta');
           if (!marca) return;
           var j = k++;
-          destinos.push({ id: id, final: false, x: j % 2 === 0 ? mx : W - mx, y: cy(marca.getBoundingClientRect()), g: art.getBoundingClientRect().top - pr.top });
+          destinos.push({ id: id, final: false, x: movil || j % 2 === 0 ? mx : W - mx, y: cy(marca.getBoundingClientRect()), g: art.getBoundingClientRect().top - pr.top });
         });
       }
     });
     if (!destinos.length) return;
 
     // Primer tramo: sale de la punta hacia la izquierda, baja por el medianil y cruza en el hueco bajo la portada
-    var d = 'M' + sx + ' ' + sy + ' C' + (sx - 20) + ' ' + sy + ' ' + gx + ' ' + (sy + 8) + ' ' + gx + ' ' + (sy + 48);
+    var d;
     var t0 = destinos[0];
-    var corte = Math.max(sy + 48, t0.g - 72);
-    d += ' L' + gx + ' ' + corte + ' C' + gx + ' ' + (corte + 82) + ' ' + t0.x + ' ' + (corte + 82) + ' ' + t0.x + ' ' + (corte + 172) + ' L' + t0.x + ' ' + t0.y;
+    var cTopPrev = $('contacto').getBoundingClientRect().top - pr.top;
+    if (movil) {
+      // Arranca en el pie de la portada y baja recta hasta la primera diana
+      var y0 = Math.min(t0.y - 24, $('hero').getBoundingClientRect().bottom - pr.top - 56);
+      d = 'M' + lx + ' ' + Math.max(0, y0) + ' L' + lx + ' ' + t0.y;
+    } else {
+      d = 'M' + sx + ' ' + sy + ' C' + (sx - 20) + ' ' + sy + ' ' + gx + ' ' + (sy + 8) + ' ' + gx + ' ' + (sy + 48);
+      var corte = Math.max(sy + 48, t0.g - 72);
+      d += ' L' + gx + ' ' + corte + ' C' + gx + ' ' + (corte + 82) + ' ' + t0.x + ' ' + (corte + 82) + ' ' + t0.x + ' ' + (corte + 172) + ' L' + t0.x + ' ' + t0.y;
+    }
     var prev = t0;
     destinos.slice(1).forEach(function (t) {
-      var a = Math.max(prev.y, t.g - 100);
-      d += ' L' + prev.x + ' ' + a + ' C' + prev.x + ' ' + t.g + ' ' + t.x + ' ' + t.g + ' ' + t.x + ' ' + (t.g + 100) + ' L' + t.x + ' ' + t.y;
+      if (movil) {
+        if (t.final) {
+          // Giro corto dentro del hueco del cierre hasta el borde de la diana final
+          var a2 = Math.max(prev.y, Math.min(t.y - 40, cTopPrev + 4)), m = (a2 + t.y) / 2;
+          d += ' L' + prev.x + ' ' + a2 + ' C' + prev.x + ' ' + m + ' ' + t.x + ' ' + m + ' ' + t.x + ' ' + t.y;
+        } else d += ' L' + t.x + ' ' + t.y;
+      } else {
+        var a = Math.max(prev.y, t.g - 100);
+        d += ' L' + prev.x + ' ' + a + ' C' + prev.x + ' ' + t.g + ' ' + t.x + ' ' + t.g + ' ' + t.x + ' ' + (t.g + 100) + ' L' + t.x + ' ' + t.y;
+      }
       prev = t;
     });
 
@@ -1072,13 +1095,13 @@
     destinos.forEach(function (t) {
       if (t.final) return;
       var g = sv('g', { class: 'tr-diana', transform: 'translate(' + t.x + ' ' + t.y + ')' }, [
-        sv('circle', { class: 'anillo anillo-ext', r: '15' }), sv('circle', { class: 'anillo centro', r: '7' }), sv('circle', { class: 'impacto', r: '15' })
+        sv('circle', { class: 'anillo anillo-ext', r: String(movil ? rDiana : 15) }), sv('circle', { class: 'anillo centro', r: String(movil ? Math.round(rDiana * 0.47) : 7) }), sv('circle', { class: 'impacto', r: String(movil ? rDiana : 15) })
       ]);
       tr.appendChild(g);
       dianas.push({ y: t.y, g: g, on: false });
     });
 
-    var flecha = sv('g', { class: 'tr-flecha' }, flechaDibujo(28, 10, 6));
+    var flecha = sv('g', { class: 'tr-flecha' }, movil ? flechaDibujo(24, 9, 5) : flechaDibujo(28, 10, 6));
     tr.appendChild(flecha);
 
     var total = camino.getTotalLength();

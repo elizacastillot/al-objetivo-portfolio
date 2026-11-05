@@ -714,9 +714,8 @@ html:not([data-entorno="local"]) .estado, html:not([data-entorno="local"]) .marc
 .pie a:focus-visible { outline-color: var(--white); }
 .pie-copy { font-size: var(--fs-label); font-weight: 400; color: var(--on-navy-muted); }
 
-/* ---------- trayectoria (desde 1200 px) ---------- */
-.trayectoria { display: none; position: absolute; left: 0; top: 0; width: 100%; height: 100%; z-index: 1; pointer-events: none; overflow: visible; }
-@media (min-width: 1200px) { .trayectoria { display: block; } }
+/* ---------- trayectoria (recta en el margen izquierdo hasta 1199 px; curva con dianas laterales desde 1200 px) ---------- */
+.trayectoria { display: block; position: absolute; left: 0; top: 0; width: 100%; height: 100%; z-index: 1; pointer-events: none; overflow: visible; }
 .tr-camino { fill: none; stroke: var(--linea-por); stroke-width: 1.5; stroke-dasharray: 1 9; stroke-linecap: round; }
 .tr-recorrido { fill: none; stroke: var(--linea-hecha); stroke-width: 1.75; }
 .tr-camino.tr-sobre-navy { stroke: var(--linea-por-navy); }
